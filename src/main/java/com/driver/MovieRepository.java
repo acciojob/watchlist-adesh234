@@ -8,57 +8,80 @@ import java.util.List;
 
 @Repository
 public class MovieRepository {
-    private HashMap<String,Movie> movieHashMap;
-    private HashMap<String,Director> directorHashMap;
-    private HashMap<String, List<String>> directorMovieMap;
-    public MovieRepository(){
-        this.movieHashMap = new HashMap<>();
-        this.directorHashMap = new HashMap<>();
-        this.directorMovieMap = new HashMap<>();
+    HashMap<String,Movie> movieHashMap = new HashMap<>();
+    HashMap<String,Director> directorHashMap = new HashMap<>();
+    HashMap<String, List<String>> pairHashMap = new HashMap<>();
+
+    public void addMovie(Movie movie){
+        movieHashMap.put(movie.getName(), movie);
     }
-    public void saveMovie(Movie movie){
-        movieHashMap.put(movie.getName(),movie);
-    }
-    public void saveDirector(Director director){
+
+    public void addDirector(Director director){
         directorHashMap.put(director.getName(), director);
     }
-    public void saveMovieDirectorPair(String movie,String director){
-        if(movieHashMap.containsKey(movie) && directorHashMap.containsKey(director)){
-            List<String> currMovies = new ArrayList<>();
-            if(directorMovieMap.containsKey(director)) currMovies = directorMovieMap.get(director);
-            currMovies.add(movie);
-            directorMovieMap.put(director,currMovies);
+
+    public void addMovieDirectorPair(String movieName, String directorName){
+        if(pairHashMap.containsKey(directorName)){
+            pairHashMap.get(directorName).add(movieName);
+        }
+        else{
+            List<String> list = new ArrayList<>();
+            list.add(movieName);
+            pairHashMap.put(directorName,list);
         }
     }
-    public Movie findMovie(String Movie){
-        return movieHashMap.get(Movie);
+
+//    public void addMovieDirectorPair(String movie , String director) {
+//        List<String> currentmovies = new ArrayList<>();
+//        if (movieHashMap.containsKey(movie) && directorHashMap.containsKey(director)) {
+//            if(pairHashMap.containsKey(director))
+//            {
+//                currentmovies = pairHashMap.get(director) ;
+//            }
+//            currentmovies.add(movie) ;
+//            pairHashMap.put(director, currentmovies) ;
+//        }
+//    }
+
+    public Movie getMovieByName(String name){
+        return movieHashMap.get(name);
     }
-    public Director findDirector(String Director){
-        return directorHashMap.get(Director);
+
+    public Director getDirectorByName(String name){
+        return directorHashMap.get(name);
     }
-    public List<String> getMoviesOfDirector(String director){
-        return directorMovieMap.get(director);
+
+    public List<String> getMoviesByDirectorName(String name){
+        return pairHashMap.get(name);
     }
-    public List<String> getAllMovies(){
-        List<String> l = new ArrayList<>();
+
+    public List<String> findAllMovies(){
+        List<String> list = new ArrayList<>();
         for(String s : movieHashMap.keySet()){
-            l.add(s);
+            list.add(s);
         }
-        return l;
+
+        return list;
     }
-    public void deleteDirectorAndMovies(String director){
-        //remove from movie HashMap
-        List<String> movieList = directorMovieMap.get(director);
+
+    public void deleteDirectorByName(String name){
+
+        //deleting from movieHashmap
+        List<String> movieList = pairHashMap.get(name);
         for(String s : movieList){
             movieHashMap.remove(s);
         }
-        //remove from director hashmap
-        directorHashMap.remove(director);
-        //remove from pair hashmap
-        directorMovieMap.remove(director);
+        //deleting from directorHashmap
+        directorHashMap.remove(name);
+        //deleting from pairHashMap
+        pairHashMap.remove(name);
+
     }
+
     public void deleteAllDirectors(){
-        for(String s : directorMovieMap.keySet())
-            deleteDirectorAndMovies(s);
+        for(String directorName : pairHashMap.keySet()){
+            deleteDirectorByName(directorName);
+        }
     }
+
 }
